@@ -132,7 +132,7 @@ def build_jql_query(project_keys, start_date, end_date):
 
 def fetch_all_issues(jql):
     """Fetch all issues matching the JQL query"""
-    issues_url = f"{base_url}/rest/api/3/search"
+    issues_url = f"{base_url}/rest/api/3/search/jql"
     
     # Include fields needed for the report
     fields = [
