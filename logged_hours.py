@@ -132,7 +132,7 @@ def build_jql_query(project_keys, start_date, end_date):
 
 def fetch_all_issues(jql):
     """Fetch all issues matching the JQL query"""
-    issues_url = f"{base_url}/rest/api/3/search"
+    issues_url = f"{base_url}/rest/api/3/search/jql"
     
     # Include fields needed for the report
     fields = [
@@ -148,12 +148,11 @@ def fetch_all_issues(jql):
 
     print(f"Fetching issues...")
     all_issues = []
-    start_at = 0
-    total = None
-
-    while total is None or start_at < total:
-        issues_query["startAt"] = start_at
-        
+    next_page_token = None
+    is_last_time = False
+    while is_last_time is False:
+        if next_page_token:
+            issues_query["nextPageToken"] = next_page_token 
         response = requests.post(
             issues_url,
             headers=headers,
@@ -168,12 +167,13 @@ def fetch_all_issues(jql):
             
         data = response.json()
         
-        if total is None:
-            total = data["total"]
-            print(f"Found {total} issues with worklogs in the period")
+        if data['isLast'] is True: 
+            is_last_time = True
+            print(f"Found {len(data["issues"])} issues with worklogs in the period")
+        else:
+            next_page_token = data['nextPageToken']
         
         all_issues.extend(data["issues"])
-        start_at += len(data["issues"])
         
         if len(data["issues"]) == 0:
             break
