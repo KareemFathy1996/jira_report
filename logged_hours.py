@@ -152,7 +152,6 @@ def fetch_all_issues(jql):
     total = None
 
     while total is None or start_at < total:
-        issues_query["startAt"] = start_at
         
         response = requests.post(
             issues_url,
